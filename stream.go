@@ -46,15 +46,15 @@ func newStream(streamID uint32, conn *Conn) *Stream {
 }
 
 func (s *Stream) WriteWinAckSize(chunkStreamID int, timestamp uint32, msg *message.WinAckSize) error {
-	return s.write(chunkStreamID, timestamp, msg)
+	return s.Write(chunkStreamID, timestamp, msg)
 }
 
 func (s *Stream) WriteSetPeerBandwidth(chunkStreamID int, timestamp uint32, msg *message.SetPeerBandwidth) error {
-	return s.write(chunkStreamID, timestamp, msg)
+	return s.Write(chunkStreamID, timestamp, msg)
 }
 
 func (s *Stream) WriteUserCtrl(chunkStreamID int, timestamp uint32, msg *message.UserCtrl) error {
-	return s.write(chunkStreamID, timestamp, msg)
+	return s.Write(chunkStreamID, timestamp, msg)
 }
 
 func (s *Stream) Connect(
@@ -130,7 +130,7 @@ func (s *Stream) ReplyConnect(
 }
 
 func (s *Stream) CreateStream(
-	body *message.NetConnectionConnect,
+	body *message.NetConnectionCreateStream,
 ) (*message.NetConnectionCreateStreamResult, error) {
 	transactionID := int64(2) // TODO: fix
 	t, err := s.transactions.Create(transactionID)
@@ -139,7 +139,7 @@ func (s *Stream) CreateStream(
 	}
 
 	if body == nil {
-		body = &message.NetConnectionConnect{}
+		body = &message.NetConnectionCreateStream{}
 	}
 
 	chunkStreamID := 3 // TODO: fix
@@ -249,7 +249,7 @@ func (s *Stream) writeCommandMessage(
 		return err
 	}
 
-	return s.write(chunkStreamID, timestamp, &message.CommandMessage{
+	return s.Write(chunkStreamID, timestamp, &message.CommandMessage{
 		CommandName:   commandName,
 		TransactionID: transactionID,
 		Encoding:      s.encTy,
@@ -257,7 +257,26 @@ func (s *Stream) writeCommandMessage(
 	})
 }
 
-func (s *Stream) write(chunkStreamID int, timestamp uint32, msg message.Message) error {
+func (s *Stream) WriteDataMessage(
+	chunkStreamID int,
+	timestamp uint32,
+	name string,
+	body message.AMFConvertible,
+) error {
+	buf := new(bytes.Buffer)
+	amfEnc := message.NewAMFEncoder(buf, message.EncodingTypeAMF0)
+	if err := message.EncodeBodyAnyValues(amfEnc, body); err != nil {
+		return err
+	}
+
+	return s.Write(chunkStreamID, timestamp, &message.DataMessage{
+		Name:     name,
+		Encoding: message.EncodingTypeAMF0,
+		Body:     buf,
+	})
+}
+
+func (s *Stream) Write(chunkStreamID int, timestamp uint32, msg message.Message) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second) // TODO: Fix 5s
 	defer cancel()
 
