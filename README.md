@@ -1,6 +1,7 @@
 # go-rtmp
 
-![Test](https://github.com/edgeware/go-rtmp/workflows/Test/badge.svg)
+![Test](https://github.com/edgeware/go-rtmp/workflows/Go/badge.svg)
+![golangci-lint](https://github.com/edgeware/go-rtmp/workflows/golangci-lint/badge.svg?branch=master)
 [![GoDoc](https://godoc.org/github.com/edgeware/go-rtmp?status.svg)](http://godoc.org/github.com/edgeware/go-rtmp)
 [![Go Report Card](https://goreportcard.com/badge/github.com/edgeware/go-rtmp)](https://goreportcard.com/report/github.com/edgeware/go-rtmp)
 [![license](https://img.shields.io/github/license/edgeware/go-rtmp.svg)](https://github.com/edgeware/go-rtmp/blob/master/LICENSE_1_0.txt)
