@@ -8,8 +8,9 @@
 package message
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type netStreamTestCase struct {
@@ -32,6 +33,14 @@ var netStreamTestCases = []netStreamTestCase{
 			CommandObject:  nil,
 			PublishingName: "aaa",
 			PublishingType: "bbb",
+		},
+	},
+	netStreamTestCase{
+		Name: "NetStreamReleaseStream OK",
+		Box:  &NetStreamReleaseStream{},
+		Args: []interface{}{nil, "theStream"}, // First argument is unknown
+		ExpectedMsg: &NetStreamReleaseStream{
+			StreamName: "theStream",
 		},
 	},
 }
